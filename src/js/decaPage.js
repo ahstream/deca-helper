@@ -9,7 +9,7 @@ import {
   sleep,
   waitForSelector,
   millisecondsAhead,
-  random,
+  randomInt,
   simulateClick,
   noDuplicatesByObject,
   fetchHelper,
@@ -18,7 +18,14 @@ import {
   dispatch,
 } from '@ahstream/hx-lib';
 import { createStatusbar } from '@ahstream/hx-statusbar';
-import { DECA_DXP_URL, DECA_UPGRADE_URL, DECA_STANDARD_PAGES, DECA_ARTISTS_PAGE_RE, ARTBLOCKS_TOKEN_URL_PREFIX } from './decaHelperLib.js';
+import {
+  createStatusbarButtons,
+  DECA_DXP_URL,
+  DECA_UPGRADE_URL,
+  DECA_STANDARD_PAGES,
+  DECA_ARTISTS_PAGE_RE,
+  ARTBLOCKS_TOKEN_URL_PREFIX,
+} from './decaHelperLib.js';
 
 // DATA ----------------------------------------------------------------------------------
 
@@ -434,27 +441,12 @@ function addStatusbarButtons() {
     return;
   }
 
-  const btnOptions = document.createElement('button');
-  btnOptions.id = 'show-options-page';
-  btnOptions.innerText = 'Options';
-  btnOptions.addEventListener('click', () => chrome.runtime.sendMessage({ cmd: 'openOptionsPage' }));
-
-  const btnAllQuests = document.createElement('button');
-  btnAllQuests.id = 'run-all-quests';
-  btnAllQuests.innerText = 'Run Quests';
-  btnAllQuests.addEventListener('click', runAllQuestsButtonHandler);
-
-  pageState.statusbar.addButtons([btnAllQuests, btnOptions]);
-}
-
-async function runAllQuestsButtonHandler(event) {
-  console.log('runAllQuestsButtonHandler', event);
-  await addPendingRequest(DECA_DXP_URL, { action: 'runDecaQuests' });
-  if (window.location.href === DECA_DXP_URL) {
-    window.location.reload();
-  } else {
-    window.location.href = DECA_DXP_URL;
-  }
+  pageState.statusbar.buttons(
+    createStatusbarButtons({
+      options: true,
+      quest: true,
+    })
+  );
 }
 
 /*
@@ -614,7 +606,7 @@ async function runFollowFeaturedArtists() {
   const info = storage.options.followAndSubscribe ? 'Follow and subscribe to featured artists...' : 'Follow featured artists...';
   updateStatusbar(info);
 
-  await sleep(random(6000, 9000));
+  await sleep(randomInt(6000, 9000));
 
   const elems = [...document.querySelectorAll('footer:not(.fixed)')];
 
@@ -630,7 +622,7 @@ async function runFollowFeaturedArtists() {
     console.log('link', link);
     await addPendingRequest(link.href, { action: 'follow' });
     window.open(link.href);
-    await sleep(random(5000, 10000));
+    await sleep(randomInt(5000, 10000));
   }
 
   const info2 = storage.options.followAndSubscribe ? 'Followed and subscribed to featured artists!' : 'Followed featured artists!';
@@ -641,7 +633,7 @@ async function followArtist() {
   const info = storage.options.followAndSubscribe ? 'Follow and subscribe to current artist...' : 'Follow current artist...';
   updateStatusbar(info);
 
-  await sleep(random(6000, 9000));
+  await sleep(randomInt(6000, 9000));
 
   const elemsFollow = [...document.querySelectorAll('button')].filter((x) => x.innerText.toLowerCase() === 'follow');
   for (const elem of elemsFollow) {
@@ -679,8 +671,9 @@ async function runDecaQuests() {
   }
 
   if (!storage.options.forceActivityQuest) {
-    updateStatusbar('Claiming finished rewards after anti-bot pause...');
-    await sleep(random(storage.options.sleepBeforeActivityQuestMin * 1000, storage.options.sleepBeforeActivityQuestMax * 1000));
+    const n = randomInt(storage.options.sleepBeforeActivityQuestMin, storage.options.sleepBeforeActivityQuestMax);
+    updateStatusbar(`Claiming finished rewards after delay of ${n} secs`);
+    await sleep(n * 1000);
   } else {
     updateStatusbar('Claiming finished rewards in fast mode...');
   }
@@ -917,14 +910,15 @@ async function runViweQuest() {
     return;
   }
 
-  if (!storage.options.runViewQuest) {
-    console.log('runViewQuest is disabled');
+  if (!storage.options.enableViewQuest) {
+    console.log('enableViewQuest is disabled');
     return;
   }
 
   if (!storage.options.forceViewQuest) {
-    updateStatusbar('Run View quest after anti-bot pause...');
-    await sleep(random(storage.options.sleepBeforeViewQuestMin * 1000, storage.options.sleepBeforeViewQuestMax * 1000));
+    const n = randomInt(storage.options.sleepBeforeViewQuestMin, storage.options.sleepBeforeViewQuestMax);
+    updateStatusbar(`Run View quest after delay of ${n} secs`);
+    await sleep(n * 1000);
   } else {
     updateStatusbar('Run View quest in fast mode...');
   }
@@ -992,14 +986,15 @@ async function runArtQuest(pageData) {
       return false;
     }
 
-    if (!storage.options.runArtQuest) {
-      console.log('runArtQuest is disabled');
+    if (!storage.options.enableArtQuest) {
+      console.log('enableArtQuest is disabled');
       return false;
     }
 
     if (!storage.options.forceArtQuest) {
-      updateStatusbar('Run Art quest after anti-bot pause...');
-      await sleep(random(storage.options.sleepBeforeArtQuestMin * 1000, storage.options.sleepBeforeArtQuestMax * 1000));
+      const n = randomInt(storage.options.sleepBeforeArtQuestMin, storage.options.sleepBeforeArtQuestMax);
+      updateStatusbar(`Run Art quest after delay of ${n} secs`);
+      await sleep(n * 1000);
     } else {
       updateStatusbar('Run Art quest in fast mode...');
     }
@@ -1064,7 +1059,7 @@ async function reportSolvedDecaArtQuery(collectionName) {
     if (!btnElem) {
       console.error('Invalid art quest btnElem!', btnElem);
     }
-    await sleep(100);
+    await sleep(randomInt(1500, 3000));
     console.log('solveDecaArtQuest: btnElem', btnElem);
     btnElem.click();
 
@@ -1098,14 +1093,15 @@ async function runCollectionQuest(pageData) {
       return;
     }
 
-    if (!storage.options.runArtQuest) {
-      console.log('runArtQuest is disabled');
+    if (!storage.options.enableArtQuest) {
+      console.log('enableArtQuest is disabled');
       return false;
     }
 
     if (!storage.options.forceArtQuest) {
-      updateStatusbar('Run Collection quest after anti-bot pause...');
-      await sleep(random(storage.options.sleepBeforeArtQuestMin * 1000, storage.options.sleepBeforeArtQuestMax * 1000));
+      const n = randomInt(storage.options.sleepBeforeArtQuestMin, storage.options.sleepBeforeArtQuestMax);
+      updateStatusbar(`Run Collection quest after delay of ${n} secs`);
+      await sleep(n * 1000);
     } else {
       updateStatusbar('Run Collection quest in fast mode...');
     }
@@ -1371,19 +1367,14 @@ function convertIpfsUrl(url) {
 
 // STATUSBAR FUNCS -------------------------------------------------------------------------------
 
+// STATUSBAR FUNCS ----------------------------------------------------------------------------------
+
 function updateStatusbar(content, className = null) {
-  console.log('updateStatusbar', content);
-  if (pageState?.statusbar) {
-    pageState.statusbar.add(content, className);
-  }
+  pageState.statusbar.text(content, className);
 }
 
 function updateStatusbarOk(content) {
   updateStatusbar(content, 'ok');
-}
-
-function updateStatusbarError(content) {
-  updateStatusbar(content, 'error');
 }
 
 function updateStatusbarInfo(content) {
@@ -1392,6 +1383,10 @@ function updateStatusbarInfo(content) {
 
 function updateStatusbarWarning(content) {
   updateStatusbar(content, 'warning');
+}
+
+function updateStatusbarError(content) {
+  pageState.statusbar.error(content);
 }
 
 // MISC HELPERS ----------------------------------------------------------

@@ -12,4 +12,4 @@ npm run prod
 
 Generate key to manifest: https://itero.plasmo.com/tools/generate-keypairs
 
-Current extension id:
+Current extension id: loepehlfiijjmadimiapingdmmbfinbd

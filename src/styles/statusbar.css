@@ -1,0 +1,32 @@
+@import 'baseVars.css';
+@import '@ahstream/hx-statusbar/dist/main.css';
+
+.hx-statusbar {
+  color: var(--statusbar-color);
+  background-color: var(--statusbar-background-color);
+  width: 100%;
+  height: auto;
+  position: absolute;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 9999;
+  overflow: auto;
+  opacity: 1;
+  transition: opacity 0.5s;
+  border-bottom: 1px solid white;
+  font-weight: 500;
+  font-size: 16px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.retry {
+  color: black;
+  background-color: rgb(255, 230, 0);
+}
+
+.running {
+  color: black;
+  background-color: rgb(0, 238, 255);
+}

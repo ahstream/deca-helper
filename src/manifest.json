@@ -1,0 +1,45 @@
+{
+  "name": "Deca Helper",
+  "description": "Decaverse helpers",
+  "version": "1.0.0",
+  "manifest_version": 3,
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5LovtnGtJnL540mnKdMCwl9VircpNZzzmKQCwleYA5vxn+olncV85WPA1jr1Z8l/QZweiLzleIqTc0xoM0k+TVN4AbRbDGlvbKOUVroWFJ80YAyH219Ile5TEjbGBbG+TIbYytLXt/AhcB8jegOe4vGvdBdk0pTYmxtDCSOZIQnzcPEpU54JK0k1hJdT5nIhUJG0Sop+fcJ65x0BvO9yFukEjKNetScQ96Q0lAZ1eiLYyCYGUn+E2AFgUXT5kjdkBO6EaF1Tokfm4uwH6ujKyUJOXf3JMMdYPqqbNItL1BjPITWjkb+uKRW4sNG/Fg3K6AloMJqMZgJwlxwiXE2csQIDAQAB",
+  "permissions": ["storage", "unlimitedStorage", "activeTab", "tabs", "webNavigation"],
+  "web_accessible_resources": [
+    {
+      "resources": ["/confirm.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "/images/icons/16.png",
+      "32": "/images/icons/32.png",
+      "48": "/images/icons/48.png",
+      "128": "/images/icons/128.png"
+    }
+  },
+  "icons": {
+    "16": "/images/icons/16.png",
+    "32": "/images/icons/32.png",
+    "48": "/images/icons/48.png",
+    "128": "/images/icons/128.png"
+  },
+  "background": {
+    "service_worker": "serviceWorker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://deca.art/*", "https://media-cdn.deca.art/*", "https://media.deca.art/*", "https://token.artblocks.io/*"],
+      "exclude_matches": [],
+      "css": ["styles/decaPage.css"],
+      "js": ["decaPage.js"],
+      "run_at": "document_start"
+    }
+  ]
+}

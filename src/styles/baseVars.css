@@ -1,0 +1,36 @@
+:root {
+  /* theme */
+
+  --base-theme-background-color: #0d47a1;
+  --base-theme-background-color2: rgb(252, 185, 3);
+  --base-theme-color: white;
+  --base-theme-color2: black;
+
+  /* statusbar */
+
+  --statusbar-color: var(--base-theme-color);
+  --statusbar-background-color: var(--base-theme-background-color);
+
+  --statusbar-ok-color: white;
+  --statusbar-ok-background-color: rgb(4, 136, 4);
+
+  --statusbar-error-color: white;
+  --statusbar-error-background-color: red;
+
+  --statusbar-retry-color: white;
+  --statusbar-retry-background-color: rgb(255, 230, 0);
+
+  --statusbar-running-color: black;
+  --statusbar-running-background-color: rgb(0, 238, 255);
+
+  --statusbar-btn-color: #24292e;
+  --statusbar-btn-background-color: #fafbfc;
+  --statusbar-btn-border-color: rgba(27, 31, 35, 0.15);
+
+  --statusbar-btn-hover-color: #fafbfc;
+  --statusbar-btn-hover-background-color: #24292e;
+
+  --statusbar-btn-disabled-color: #959da5;
+  --statusbar-btn-disabled-background-color: #c3c8ce;
+  --statusbar-btn-disabled-border-color: rgba(27, 31, 35, 0.15);
+}

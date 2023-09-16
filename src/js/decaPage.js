@@ -135,8 +135,11 @@ async function runPage() {
     return await runUpgradePage();
   }
 
-  if (pageState.request?.action === 'quests' && isDecaDxpPage()) {
-    return await runDecaQuests();
+  if (pageState.request?.action === 'runDecaQuestsFromShortcut' && isDecaDxpPage()) {
+    console.log('pageState.request', pageState.request);
+    const delaySecs = pageState.request.delaySecs?.length ? Number(pageState.request.delaySecs[0]) : 0;
+    console.log('runDecaQuestsFromShortcut, delaySecs:', delaySecs);
+    return await runDecaQuests(delaySecs);
   }
 
   if (pageState.request?.action === 'runDecaQuests' && isDecaDxpPage()) {
@@ -655,7 +658,14 @@ async function followArtist() {
 
 // DECA QUESTS --------------------------------------------------------------------------------------------
 
-async function runDecaQuests() {
+async function runDecaQuests(delaySecs = 0) {
+  if (delaySecs) {
+    const runAt = new Date(millisecondsAhead(delaySecs * 1000, new Date()));
+    const runAtStr = storage.options.DEFAULT_LOCALE ? runAt.toLocaleString(storage.options.DEFAULT_LOCALE) : runAt.toLocaleString();
+    updateStatusbarWarning(`Delay run of deca quests ${delaySecs} seconds until ${runAtStr}...`);
+    await sleep(delaySecs * 1000);
+  }
+
   chrome.runtime.sendMessage({ cmd: 'closeOtherDecaPages' });
 
   if (isRestarted()) {
@@ -690,8 +700,26 @@ async function runDecaQuests() {
     updateStatusbarWarning('No quests found');
   }
 
-  const p1 = runViweQuest();
-  const p2 = runArtQuest(questData);
+  let shouldRunViewQuest = true;
+  if (typeof pageState.request?.shouldRunViewQuest !== 'undefined') {
+    console.log('shouldRunViewQuest from request!');
+    shouldRunViewQuest = pageState.request?.shouldRunViewQuest;
+  } else if (!storage.options.forceViewQuest && shouldSkipQuest(storage.options.skipViewQuestPct)) {
+    shouldRunViewQuest = false;
+  }
+  console.log('shouldRunViewQuest', shouldRunViewQuest);
+
+  let shouldRunArtQuest = true;
+  if (typeof pageState.request?.shouldRunArtQuest !== 'undefined') {
+    console.log('shouldRunArtQuest from request!');
+    shouldRunArtQuest = pageState.request?.shouldRunArtQuest;
+  } else if (!storage.options.forceArtQuest && shouldSkipQuest(storage.options.skipArtQuestPct)) {
+    shouldRunArtQuest = false;
+  }
+  console.log('shouldRunArtQuest', shouldRunArtQuest);
+
+  const p1 = runViweQuest(shouldRunViewQuest);
+  const p2 = runArtQuest(questData, shouldRunArtQuest);
   const p3 = runCollectionQuest(questData);
 
   updateStatusbar('Wait for quests to finish...');
@@ -710,7 +738,7 @@ async function runDecaQuests() {
     if (!isRestarted()) {
       console.log('Is not restarted!');
       await claimBastardRewards(5, 1);
-      restartDecaQuests();
+      restartDecaQuests('restart', shouldRunViewQuest, shouldRunArtQuest);
       return;
     }
 
@@ -760,9 +788,9 @@ async function claimBastardRewards(maxWaitSecs = 5 * 60, intervalSecs = 10) {
   await claimRewards();
 }
 
-async function restartDecaQuests(action = 'restart') {
+async function restartDecaQuests(action, shouldRunViewQuest, shouldRunArtQuest) {
   updateStatusbar('Restarting Deca quests to make sure everything gets done...');
-  await addPendingRequest(DECA_DXP_URL, { action });
+  await addPendingRequest(DECA_DXP_URL, { action, shouldRunViewQuest, shouldRunArtQuest });
   await sleep(500);
   window.location.reload();
 }
@@ -904,7 +932,19 @@ function openLink(url, forceForeground = false) {
   return chrome.runtime.sendMessage({ cmd: 'openTab', url, active: false });
 }
 
-async function runViweQuest() {
+function shouldSkipQuest(pct) {
+  const n = typeof pct === 'number' ? pct : 0;
+  const rnd = randomInt(1, 100);
+  console.log('shouldSkipQuest; pct, n, rnd, flag:', pct, n, rnd, rnd <= n);
+  return rnd <= n;
+}
+
+async function runViweQuest(shouldRun) {
+  if (!shouldRun) {
+    updateStatusbar('View quest is skipped!');
+    return;
+  }
+
   if (!hasViewQuest()) {
     updateStatusbar('No View quest found!');
     return;
@@ -978,9 +1018,15 @@ async function runViweQuest() {
 
 // DECA ART QUEST --------------------------------------------------------------------------------------------
 
-async function runArtQuest(pageData) {
+async function runArtQuest(pageData, shouldRun) {
   try {
-    console.log('runArtQuest', pageData);
+    console.log('runArtQuest', pageData, shouldRun);
+
+    if (!shouldRun) {
+      updateStatusbar('Art quest is skipped!');
+      return;
+    }
+
     if (!pageData || !pageData.artQuest || !pageData.artQuest.length) {
       updateStatusbar('No Art quest found');
       return false;

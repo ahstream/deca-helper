@@ -8,6 +8,7 @@ export const defaultOptions = {
 
   enableArtQuest: true,
   forceArtQuest: false,
+  skipArtQuestPct: 0,
   sleepBeforeArtQuestMin: 60,
   sleepBeforeArtQuestMax: 120,
   //artQuestPctFail: 30,
@@ -15,6 +16,7 @@ export const defaultOptions = {
 
   enableViewQuest: true,
   forceViewQuest: false,
+  skipViewQuestPct: 0,
   sleepBeforeViewQuestMin: 25,
   sleepBeforeViewQuestMax: 50,
 
@@ -895,4 +897,6 @@ export const defaultOptions = {
   ],
 };
 
-export const overrideOptions = {};
+export const overrideOptions = {
+  DEFAULT_LOCALE: 'sv-SE',
+};

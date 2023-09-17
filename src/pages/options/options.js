@@ -44,19 +44,19 @@ const options = [
         [
           [
             'propertyCell',
-            'skipArtQuestPct',
-            'Skip Art Quest percentage (0-100)',
-            null,
-            'Skip doing quest sometimes to simulate more human like behaviour',
-          ],
-          [
-            'propertyCell',
             'sleepBeforeArtQuestMin',
             'Min Anti-bot delay (seconds)',
             null,
             'Anti-bot detection delay is random time to pause before running quest',
           ],
           ['propertyCell', 'sleepBeforeArtQuestMax', 'Max Anti-bot delay (seconds)'],
+          [
+            'propertyCell',
+            'skipArtQuestPct',
+            'Skip Art Quest percentage (0-100)',
+            null,
+            'Skip doing quest sometimes to simulate more human like behaviour',
+          ],
         ],
       ],
 
@@ -75,19 +75,19 @@ const options = [
         [
           [
             'propertyCell',
-            'skipViewQuestPct',
-            'Skip View Quest percentage (0-100)',
-            null,
-            'Skip doing quest sometimes to simulate more human like behaviour',
-          ],
-          [
-            'propertyCell',
             'sleepBeforeViewQuestMin',
             'Min Anti-bot delay (seconds)',
             null,
             'Anti-bot detection delay is random time to pause before running quest',
           ],
           ['propertyCell', 'sleepBeforeViewQuestMax', 'Max Anti-bot delay (seconds)'],
+          [
+            'propertyCell',
+            'skipViewQuestPct',
+            'Skip View Quest percentage (0-100)',
+            null,
+            'Skip doing quest sometimes to simulate more human like behaviour',
+          ],
         ],
       ],
     ],
@@ -108,8 +108,16 @@ const options = [
         ],
       ],
 
-      ['property', 'publicGalleries', 'Public galleries (taken in order from these)'],
-      ['property', 'visitedGalleries', 'Visited galleries (visited ones is automatically put here)'],
+      ['space', 25],
+
+      ['property', 'publicGalleries', 'All public galleries to visit (taken in order from these)'],
+      [
+        'property',
+        'visitedGalleries',
+        'Already visited galleries (automatically updated)',
+        null,
+        'Empty this field to start over and visit all public galleries again',
+      ],
     ],
   },
 

@@ -318,10 +318,11 @@ async function showViewGalleryPage() {
     const elems = [...document.querySelectorAll('div.whitespace-nowrap')].filter((e) => e.innerText.includes('view'));
     console.log('wait for load trigger elems:', elems);
     if (elems) {
+      const secs = storage.options.forceViewQuest ? 2 : storage.options.openGalleryPageEveryNthSec + 10;
       setTimeout(() => {
         console.log('Close window after onload!');
         window.close();
-      }, (storage.options.openGalleryPageEveryNthSec + 10) * 1000);
+      }, secs * 1000);
       console.log('gallery page loaded, close after some time...');
       return;
     }
@@ -479,7 +480,7 @@ async function getQuestData() {
     const data = await getQuestDataElements();
     pageState.questData = data;
     console.log('pageState.questData', pageState.questData);
-    if (data.collectionQuest || data.artQuest) {
+    if (data?.collectionQuest || data?.artQuest) {
       return data;
     }
     await sleep(1000);
@@ -753,12 +754,12 @@ async function runDecaQuests(delaySecs = 0) {
 
       const questData2 = await getQuestData();
       console.log('questData2', questData2);
-      if ((questData2.artQuest && questData2.artQuest.length) || (questData2.collectionQuest && questData2.collectionQuest?.length)) {
-        if (questData2.artQuest && questData2.artQuest.length && pageState.artQuestDone) {
+      if ((questData2?.artQuest && questData2.artQuest?.length) || (questData2?.collectionQuest && questData2?.collectionQuest?.length)) {
+        if (questData2?.artQuest && questData2.artQuest?.length && pageState.artQuestDone) {
           updateStatusbarError(`Art quest could not be solved, do this one manually`);
           return;
         }
-        if (questData2.collectionQuest && questData2.collectionQuest?.length && pageState.isCollectionQuestDone) {
+        if (questData2?.collectionQuest && questData2.collectionQuest?.length && pageState.isCollectionQuestDone) {
           updateStatusbarError(`Collection quest could not be solved, do this one manually (or try with Force Run)`);
           return;
         }

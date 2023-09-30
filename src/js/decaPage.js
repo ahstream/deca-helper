@@ -256,6 +256,7 @@ async function runUpgradePage(force = false) {
       return [x.innerText?.match(/.*Level ([0-9]+).*/), x];
     })
     .map((y) => [Number(y[0][1]), y[1]])
+    .filter((x) => x[1].innerText.includes('Upgrade to level'))
     .filter((x) => x[0] < storage.options.autoUpgradeMaxLevel && x[0] >= storage.options.autoUpgradeMinLevel)
     .sort((x, y) => x[0] < y[0]);
   //.reverse();

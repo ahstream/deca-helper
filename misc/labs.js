@@ -48,3 +48,6 @@ twitterArr;
 decaArr;
 console.log(twitterArr.reduce((acc, val) => acc + val + '\n', ''));
 console.log(decaArr.reduce((acc, val) => acc + val + '\n', ''));
+
+
+

@@ -746,7 +746,7 @@ async function runDecaQuests(delaySecs = 0) {
 
     await claimBastardRewards(60, 10);
 
-    const stopTime = millisecondsAhead(60 * 60 * 1000);
+    const stopTime = millisecondsAhead(3 * 60 * 60 * 1000);
     while (Date.now() <= stopTime) {
       if (await cleanupIfFinishedAllQuests()) {
         return updateStatusbarOk(`All deca quests are finished!`);
@@ -770,10 +770,16 @@ async function runDecaQuests(delaySecs = 0) {
         return runDecaQuests();
         */
       }
-      await sleep(5000);
+      await sleep(5 * 60 * 1000);
     }
 
-    updateStatusbar('Done with deca quests!', 'ok');
+    await claimBastardRewards(60, 10);
+
+    if (await cleanupIfFinishedAllQuests()) {
+      return updateStatusbarOk(`All deca quests are finished!`);
+    }
+
+    updateStatusbar('Done with deca quests!');
   });
 }
 

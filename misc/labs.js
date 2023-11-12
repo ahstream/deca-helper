@@ -51,3 +51,27 @@ console.log(decaArr.reduce((acc, val) => acc + val + '\n', ''));
 
 
 
+// new 2023
+
+let decaArr = [];
+
+decaArr = [
+  ...new Set(
+    [
+      ...decaArr,
+      [
+        ...new Set(
+          [...document.querySelectorAll('a')].map(x => x.href).filter(x => x.match(/https:\/\/deca.art\/[a-z0-9_\-]*/gi))
+        ),
+      ]
+        .flat()
+        .filter((x) => !!x),
+    ].flat()
+  )
+];
+
+window.scrollBy(0, 3000);
+
+decaArr;
+
+console.log(decaArr.reduce((acc, val) => acc + val + '\n', ''));

@@ -11,7 +11,7 @@ import {
   millisecondsAhead,
   randomInt,
   simulateClick,
-  noDuplicatesByObject,
+  noDuplicates,
   fetchHelper,
   waitForTextStartsWith,
   addPendingRequest,
@@ -918,8 +918,13 @@ async function getGalleryLinks(numToOpen) {
   links = [...new Set(links)];
   console.log('links no dups', links);
 
+  let n = randomInt(1, links.length);
+  let scrambledLinks = [...links.splice(n - 1), ...links.splice(0, n - 1)];
+  scrambledLinks = [...new Set(scrambledLinks)];
+  console.log('scrambledLinks', scrambledLinks);
+
   console.log('storage.options.visitedGalleries', storage.options.visitedGalleries);
-  const newLinks = links.filter((link) => !storage.options.visitedGalleries.includes(link));
+  const newLinks = scrambledLinks.filter((link) => !storage.options.visitedGalleries.includes(link));
   console.log('links not visited', newLinks);
 
   return newLinks;
@@ -978,6 +983,10 @@ async function runViweQuest(shouldRun) {
 
   const numLinks = galleryLinks.length;
   console.log('galleryLinks', galleryLinks, numLinks, numToOpen);
+
+  if (numToOpen) {
+    return;
+  }
 
   let isClaimed = false;
   let numOpened = 0;
@@ -1209,10 +1218,10 @@ async function runCollectionQuest(pageData) {
       });
     });
 
-    const candidatesAll = noDuplicatesByObject([...candidates.all]);
-    const candidates1 = noDuplicatesByObject([...candidates.p1]);
-    const candidates2 = noDuplicatesByObject([...candidates.p2]);
-    const candidates3 = noDuplicatesByObject([...candidates.p3]);
+    const candidatesAll = noDuplicates([...candidates.all]);
+    const candidates1 = noDuplicates([...candidates.p1]);
+    const candidates2 = noDuplicates([...candidates.p2]);
+    const candidates3 = noDuplicates([...candidates.p3]);
 
     console.log('candidatesAll', candidatesAll);
     console.log('candidates1', candidates1);

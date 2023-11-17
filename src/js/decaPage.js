@@ -984,10 +984,6 @@ async function runViweQuest(shouldRun) {
   const numLinks = galleryLinks.length;
   console.log('galleryLinks', galleryLinks, numLinks, numToOpen);
 
-  if (numToOpen) {
-    return;
-  }
-
   let isClaimed = false;
   let numOpened = 0;
   while ((hasViewQuest() && numOpened < numToOpen) || numOpened < numToOpen) {

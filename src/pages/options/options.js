@@ -64,6 +64,41 @@ const options = [
       //['property', 'artQuestFailedNames', 'artQuestFailedNames'],
     ],
   },
+
+  {
+    header: 'Feed Quest',
+    options: [
+      ['property', 'enableFeedQuest', 'Enable Feed Quest'],
+      ['property', 'forceFeedQuest', 'Fast Mode', null, 'Run quest as fast as possible (skipping any delay config)'],
+
+      [
+        'table',
+        [
+          [
+            'propertyCell',
+            'sleepBeforeFeedQuestMin',
+            'Min Anti-bot delay (seconds)',
+            null,
+            'Anti-bot detection delay is random time to pause before running quest',
+          ],
+          ['propertyCell', 'sleepBeforeFeedQuestMax', 'Max Anti-bot delay (seconds)'],
+          [
+            'propertyCell',
+            'skipFeedQuestPct',
+            'Skip Feed Quest percentage (0-100)',
+            null,
+            'Skip doing quest sometimes to simulate more human like behaviour',
+          ],
+          ['propertyCell', 'feedQuestNumPagesToScroll', 'feedQuestNumPagesToScroll', null, 'todo'],
+          ['propertyCell', 'feedQuestDelayBetweenPageScrollsMin', 'feedQuestDelayBetweenPageScrollsMin', null, 'todo'],
+          ['propertyCell', 'feedQuestDelayBetweenPageScrollsMax', 'feedQuestDelayBetweenPageScrollsMax', null, 'todo'],
+          ['propertyCell', 'feedQuestPixelsToScroll', 'feedQuestPixelsToScroll', null, 'todo'],
+        ],
+      ],
+    ],
+  },
+
+  /*
   {
     header: 'View Quest',
     options: [
@@ -93,6 +128,7 @@ const options = [
     ],
   },
 
+
   {
     header: 'View Quest Galleries',
     options: [
@@ -120,6 +156,7 @@ const options = [
       ],
     ],
   },
+  */
 
   {
     header: 'Upgrade',

@@ -20,6 +20,10 @@ export const defaultOptions = {
   sleepBeforeViewQuestMin: 25,
   sleepBeforeViewQuestMax: 50,
 
+  enableFeedQuest: true,
+  forceFeedQuest: false,
+  skipFeedQuestPct: 0,
+
   openLinksInForeground: true,
   forceOpenedPageToFront: true,
   closeCollectionPage: false,
@@ -899,4 +903,11 @@ export const defaultOptions = {
 
 export const overrideOptions = {
   DEFAULT_LOCALE: 'sv-SE',
+
+  sleepBeforeFeedQuestMin: 5,
+  sleepBeforeFeedQuestMax: 15,
+  feedQuestNumPagesToScroll: 20,
+  feedQuestDelayBetweenPageScrollsMin: 1,
+  feedQuestDelayBetweenPageScrollsMax: 4,
+  feedQuestPixelsToScroll: 1600,
 };

@@ -34,6 +34,8 @@ const TIMEOUT_GET_QUEST_IMAGE_DATA_SECS = 15;
 const TIMEOUT_WAIT_FOR_ART_QUEST_FINISH_SECS = 60;
 const TIMEOUT_DXP_PAGE_LOADED_SECS = 10;
 
+const HOME_FEED_URL = 'https://deca.art/app';
+
 let storage = null;
 let pageState = {
   allImages: [],
@@ -128,6 +130,10 @@ async function runPage() {
 
   if (pageState.request?.action === 'view') {
     return await showViewGalleryPage();
+  }
+
+  if (pageState.request?.action === 'viewFeed') {
+    return await runFeedViewer();
   }
 
   if (pageState.request?.action === 'upgrade' && isDecaUpgradePage()) {
@@ -226,6 +232,22 @@ async function selectLevelOrder() {
       return;
     }
   }
+}
+
+async function runFeedViewer() {
+  console.log('runFeedViewer');
+
+  for (let i = 0; i < storage.options.feedQuestNumPagesToScroll; i++) {
+    console.log('scroll page');
+    window.scrollBy({ top: storage.options.feedQuestPixelsToScroll });
+    console.log('sleep...');
+
+    const delay = randomInt(storage.options.feedQuestDelayBetweenPageScrollsMin, storage.options.feedQuestDelayBetweenPageScrollsMax);
+    await sleep(delay * 1000);
+  }
+  console.log('done runFeedViewer, close page');
+  await sleep(3000);
+  window.close();
 }
 
 async function showUpgradePage() {
@@ -416,10 +438,16 @@ async function hasFinishedAllQuests(maxWaitMs = 10, intervalMs = 10) {
   const viewQuestElems = getViewQuestElems();
   const artQuestElems = getArtQuestElems();
   const collectionQuestElems = getCollectionQuestElems();
-  console.log('more checks elems:', !!elem, claimButtonElems, viewQuestElems, artQuestElems, collectionQuestElems);
+  const feedQuestElems = getFeedQuestElems();
+  console.log('more checks elems:', !!elem, claimButtonElems, viewQuestElems, artQuestElems, collectionQuestElems, feedQuestElems);
 
   const hasReallyFinished =
-    !!elem && !claimButtonElems.length && !viewQuestElems.length && !artQuestElems.length && !collectionQuestElems.length;
+    !!elem &&
+    !claimButtonElems.length &&
+    !viewQuestElems.length &&
+    !artQuestElems.length &&
+    !collectionQuestElems.length &&
+    !feedQuestElems.length;
   console.log('hasReallyFinished:', hasReallyFinished);
 
   return hasReallyFinished;
@@ -720,13 +748,16 @@ async function runDecaQuests(delaySecs = 0) {
   }
   console.log('shouldRunArtQuest', shouldRunArtQuest);
 
+  shouldRunViewQuest = false; // view quests are no longer!
   const p1 = runViweQuest(shouldRunViewQuest);
+
   const p2 = runArtQuest(questData, shouldRunArtQuest);
   const p3 = runCollectionQuest(questData);
+  const p4 = runFeedQuest();
 
   updateStatusbar('Wait for quests to finish...');
 
-  Promise.all([p1, p2, p3]).then(async (values) => {
+  Promise.all([p1, p2, p3, p4]).then(async (values) => {
     console.log('quests promise return val:', values);
     // Make sure there are no rewards not claimed!
     //chrome.runtime.sendMessage({ cmd: 'focusMyTab' });
@@ -806,7 +837,7 @@ async function restartDecaQuests(action, shouldRunViewQuest, shouldRunArtQuest) 
 async function waitForDecaPageToLoad(doClaim) {
   console.log('waitForDecaPageToLoad');
 
-  const data = { numViewQuests: 0, numCollectionQuests: 0, numArtQuests: 0 };
+  const data = { numViewQuests: 0, numCollectionQuests: 0, numArtQuests: 0, numFeedQuests: 0 };
 
   // If restarted we most likely only need to wait for one quest!
   const numQuestsNeeded = pageState.request?.action === 'restart' ? 1 : 2;
@@ -831,11 +862,16 @@ async function waitForDecaPageToLoad(doClaim) {
       console.log('has art quest!');
       data.numArtQuests = 1;
     }
+    if (hasFeedQuest()) {
+      console.log('has feed quest!');
+      data.numFeedQuests = 1;
+    }
     console.log('data', data);
-    if (data.numViewQuests + data.numCollectionQuests + data.numArtQuests >= numQuestsNeeded) {
+
+    if (data.numViewQuests + data.numCollectionQuests + data.numArtQuests + data.numFeedQuests >= numQuestsNeeded) {
       break;
     }
-    if (data.numCollectionQuests || data.numArtQuests) {
+    if (data.numCollectionQuests || data.numArtQuests || data.numFeedQuests) {
       break;
     }
     console.log('page not fully loaded yet; data:', data);
@@ -843,7 +879,7 @@ async function waitForDecaPageToLoad(doClaim) {
   }
   console.log('data after', data);
 
-  const numQuests = data.numViewQuests + data.numCollectionQuests + data.numArtQuests;
+  const numQuests = data.numViewQuests + data.numCollectionQuests + data.numArtQuests + data.numFeedQuests;
   console.log('numQuests:', numQuests);
 
   if (numQuests > 0) {
@@ -864,6 +900,10 @@ function getViewQuestElems() {
 
 function getArtQuestElems() {
   return [...document.querySelectorAll('div.bg-white')].filter((x) => x.textContent.toLowerCase().startsWith('name that art'));
+}
+
+function getFeedQuestElems() {
+  return [...document.querySelectorAll('div.bg-white')].filter((x) => x.textContent.toLowerCase().startsWith('view feed items'));
 }
 
 function getArtQuestElem() {
@@ -903,6 +943,12 @@ function hasArtQuest() {
   const elem = getArtQuestElem();
   console.log('elem with art quest:', elem);
   return elem !== null;
+}
+
+function hasFeedQuest() {
+  const elems = getFeedQuestElems();
+  console.log('elems with feed quest:', elems);
+  return elems.length > 0;
 }
 
 async function getGalleryLinks(numToOpen) {
@@ -1026,6 +1072,44 @@ async function runViweQuest(shouldRun) {
 
   // chrome.runtime.sendMessage({ cmd: 'closeNewerNormalTabs' });
   updateStatusbar('Done with view quest!');
+  chrome.runtime.sendMessage({ cmd: 'focusMyTab' });
+}
+
+// DECA FEED QUEST --------------------------------------------------------------------------------------------
+
+async function runFeedQuest(shouldRun = true) {
+  if (!shouldRun) {
+    updateStatusbar('Feed quest is skipped!');
+    return;
+  }
+
+  if (!storage.options.enableFeedQuest) {
+    console.log('enableFeedQuest is disabled');
+    return;
+  }
+
+  if (!hasFeedQuest()) {
+    updateStatusbar('No Feed quest found!');
+    return;
+  }
+
+  if (!storage.options.forceFeedQuest) {
+    const n = randomInt(storage.options.sleepBeforeFeedQuestMin, storage.options.sleepBeforeFeedQuestMax);
+    updateStatusbar(`Run Feed quest after delay of ${n} secs`);
+    await sleep(n * 1000);
+  } else {
+    updateStatusbar('Run Feed quest in fast mode...');
+  }
+
+  const url = HOME_FEED_URL;
+  await addPendingRequest(url, { action: 'viewFeed' });
+  await sleep(1000);
+  window.open(url, '_blank');
+  await sleep(storage.options.feedQuestNumPagesToScroll * storage.options.feedQuestDelayBetweenPageScrollsMax * 1000);
+  await claimRewards();
+  await sleep(1 * 1000, 5 * 1000);
+
+  updateStatusbar('Done with Feed quest!');
   chrome.runtime.sendMessage({ cmd: 'focusMyTab' });
 }
 

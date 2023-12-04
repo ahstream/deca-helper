@@ -247,7 +247,7 @@ async function runFeedViewer() {
   }
   console.log('done runFeedViewer, close page');
   await sleep(3000);
-  window.close();
+  // todo window.close();
 }
 
 async function showUpgradePage() {
@@ -801,6 +801,7 @@ async function runDecaQuests(delaySecs = 0) {
         return runDecaQuests();
         */
       }
+      console.log('sleep 5 * 60 * 1000');
       await sleep(5 * 60 * 1000);
     }
 
@@ -810,11 +811,14 @@ async function runDecaQuests(delaySecs = 0) {
       return updateStatusbarOk(`All deca quests are finished!`);
     }
 
+    restartDecaQuests('restart', shouldRunViewQuest, shouldRunArtQuest);
+
     updateStatusbar('Done with deca quests!');
   });
 }
 
 async function claimBastardRewards(maxWaitSecs = 5 * 60, intervalSecs = 10) {
+  console.log('claimBastardRewards');
   let isClaimed = false;
   const stopTime = Date.now() + maxWaitSecs * 1000;
   while (Date.now() <= stopTime) {
@@ -822,6 +826,7 @@ async function claimBastardRewards(maxWaitSecs = 5 * 60, intervalSecs = 10) {
     if (isClaimed) {
       break;
     }
+    console.log('sleep:', intervalSecs);
     await sleep(intervalSecs * 1000);
   }
   await claimRewards();

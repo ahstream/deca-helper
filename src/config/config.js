@@ -906,8 +906,8 @@ export const overrideOptions = {
 
   sleepBeforeFeedQuestMin: 5,
   sleepBeforeFeedQuestMax: 15,
-  feedQuestNumPagesToScroll: 20,
-  feedQuestDelayBetweenPageScrollsMin: 1,
-  feedQuestDelayBetweenPageScrollsMax: 4,
-  feedQuestPixelsToScroll: 1600,
+  feedQuestNumPagesToScroll: 50,
+  feedQuestDelayBetweenPageScrollsMin: 3,
+  feedQuestDelayBetweenPageScrollsMax: 5,
+  feedQuestPixelsToScroll: 800,
 };

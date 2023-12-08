@@ -777,12 +777,19 @@ async function runDecaQuests(delaySecs = 0) {
 
     await claimBastardRewards(60, 10);
 
-    const stopTime = millisecondsAhead(3 * 60 * 60 * 1000);
+    const stopTime = millisecondsAhead(15 * 60 * 1000);
     while (Date.now() <= stopTime) {
       if (await cleanupIfFinishedAllQuests()) {
         return updateStatusbarOk(`All deca quests are finished!`);
       }
       await claimRewards();
+
+      if (hasFeedQuest()) {
+        updateStatusbar('Feed quest found!');
+        await runFeedQuest();
+        await claimBastardRewards(20, 10);
+        continue;
+      }
 
       const questData2 = await getQuestData();
       console.log('questData2', questData2);
@@ -802,7 +809,7 @@ async function runDecaQuests(delaySecs = 0) {
         */
       }
       console.log('sleep 5 * 60 * 1000');
-      await sleep(5 * 60 * 1000);
+      await sleep(60 * 1000);
     }
 
     await claimBastardRewards(60, 10);

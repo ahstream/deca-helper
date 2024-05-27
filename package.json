@@ -1,5 +1,5 @@
 {
-  "name": "@ahstream/deca-helper",
+  "name": "deca-helper",
   "version": "1.0.0",
   "description": "Deca Helper",
   "author": "hstream@gmail.com",
@@ -48,9 +48,9 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
-    "@ahstream/hx-chrome-lib": "file:../hx-chrome-lib",
-    "@ahstream/hx-lib": "file:../hx-lib",
-    "@ahstream/hx-statusbar": "file:../hx-statusbar",
+    "hx-chrome-lib": "file:../hx-chrome-lib",
+    "hx-lib": "file:../hx-lib",
+    "hx-statusbar": "file:../hx-statusbar",
     "@babel/runtime": "^7.18.6"
   }
 }

@@ -1,7 +1,7 @@
 console.info('shortcuts.js begin', window?.location?.href);
 
-import { addPendingRequest } from '@ahstream/hx-lib';
-import { initShortcutsPage, mountShortcutsPage } from '@ahstream/hx-chrome-lib';
+import { addPendingRequest } from 'hx-lib';
+import { initShortcutsPage, mountShortcutsPage } from 'hx-chrome-lib';
 
 import { DECA_DXP_URL } from '../../js/decaHelperLib.js';
 

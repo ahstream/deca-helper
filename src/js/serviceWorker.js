@@ -1,8 +1,8 @@
 console.info('serviceWorker.js begin');
 
 import { defaultOptions, overrideOptions } from '../config/config';
-import { sleep, getStorageData, initStorageWithOptions, fetchHelper, addPendingRequest } from '@ahstream/hx-lib';
-import { defaultMessageHandler } from '@ahstream/hx-chrome-lib';
+import { sleep, getStorageData, initStorageWithOptions, fetchHelper, addPendingRequest } from 'hx-lib';
+import { defaultMessageHandler } from 'hx-chrome-lib';
 import { DECA_DXP_URL, DECA_UPGRADE_URL, DECA_ARTISTS_URL } from './decaHelperLib.js';
 
 const customStorage = { runtime: { pendingRequests: [] } };

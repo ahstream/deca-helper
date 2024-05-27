@@ -16,8 +16,8 @@ import {
   waitForTextStartsWith,
   addPendingRequest,
   dispatch,
-} from '@ahstream/hx-lib';
-import { createStatusbar } from '@ahstream/hx-statusbar';
+} from 'hx-lib';
+import { createStatusbar } from 'hx-statusbar';
 import {
   createStatusbarButtons,
   DECA_DXP_URL,
@@ -1547,6 +1547,6 @@ function updateStatusbarError(content) {
 // MISC HELPERS ----------------------------------------------------------
 
 function shouldPageHaveStatusbar() {
-  return true;
+  return false;
   // return isDecaDxpPage() || isDecaUpgradePage() || isDecaOneArtistPage() || isDecaAllArtistsPage();
 }

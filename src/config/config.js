@@ -905,9 +905,9 @@ export const overrideOptions = {
   DEFAULT_LOCALE: 'sv-SE',
 
   sleepBeforeFeedQuestMin: 5,
-  sleepBeforeFeedQuestMax: 15,
-  feedQuestNumPagesToScroll: 50,
+  sleepBeforeFeedQuestMax: 10,
+  feedQuestNumPagesToScroll: 70,
   feedQuestDelayBetweenPageScrollsMin: 3,
   feedQuestDelayBetweenPageScrollsMax: 5,
-  feedQuestPixelsToScroll: 800,
+  feedQuestPixelsToScroll: 1600,
 };

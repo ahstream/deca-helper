@@ -256,6 +256,32 @@ async function showUpgradePage() {
   await selectLevelOrder();
 }
 
+function getUpgradeButton() {
+  const elems = [...document.querySelectorAll('.p-4.pt-1')]
+    .map((x) => {
+      return [x.innerText?.match(/.*Level ([0-9]+).*/), x];
+    })
+    .map((y) => [Number(y[0][1]), y[1]])
+    .filter((x) => x[1].innerText.includes('Upgrade to level'))
+    .filter((x) => x[0] < storage.options.autoUpgradeMaxLevel && x[0] >= storage.options.autoUpgradeMinLevel)
+    .sort((x, y) => x[0] < y[0]);
+  //.reverse();
+  console.log('elems', elems);
+
+  if (elems.length < storage.options.autoUpgradeNth || storage.options.autoUpgradeNth < 1) {
+    updateStatusbarError('No n:th decagon to upgrade!');
+    return null;
+  }
+
+  const elem = elems[storage.options.autoUpgradeNth - 1];
+  console.log('elem', elem);
+
+  const buttons = [...elem[1].querySelectorAll('button')].filter((x) => x.innerText.startsWith('Upgrade to level'));
+  console.log('buttons', buttons);
+
+  return buttons?.length ? buttons[0] : null;
+}
+
 async function runUpgradePage(force = false) {
   console.log('runUpgradePage');
 
@@ -273,41 +299,25 @@ async function runUpgradePage(force = false) {
 
   console.log('storage', storage);
 
-  const elems = [...document.querySelectorAll('.p-4.pt-1')]
-    .map((x) => {
-      return [x.innerText?.match(/.*Level ([0-9]+).*/), x];
-    })
-    .map((y) => [Number(y[0][1]), y[1]])
-    .filter((x) => x[1].innerText.includes('Upgrade to level'))
-    .filter((x) => x[0] < storage.options.autoUpgradeMaxLevel && x[0] >= storage.options.autoUpgradeMinLevel)
-    .sort((x, y) => x[0] < y[0]);
-  //.reverse();
-  console.log('elems', elems);
+  const button = getUpgradeButton();
+  console.log('button', button);
 
-  if (elems.length < storage.options.autoUpgradeNth || storage.options.autoUpgradeNth < 1) {
-    updateStatusbarError('No n:th decagon to upgrade!');
-    return;
-  }
-
-  const elem = elems[storage.options.autoUpgradeNth - 1];
-  console.log('elem', elem);
-
-  const buttons = [...elem[1].querySelectorAll('button')].filter((x) => x.innerText.startsWith('Upgrade to level'));
-  console.log('buttons', buttons);
-  if (buttons.length) {
-    if (!(await clickUpgradeButton(buttons[0]))) {
-      scheduleRetryUpgrade();
+  while (Date.now()) {
+    const button = getUpgradeButton();
+    if (!button) {
+      break;
     }
-  } else {
-    updateStatusbarError('No decagons to upgrade!');
-    scheduleRetryUpgrade();
+    await clickUpgradeButton(button);
+    await sleep(10000);
   }
 }
 
+/*
 function scheduleRetryUpgrade(secs = 60) {
   console.log('scheduleRetryUpgrade');
   setTimeout(() => runUpgradePage(), secs * 1000);
 }
+*/
 
 async function clickUpgradeButton(button) {
   console.log('clickUpgradeButton', button);

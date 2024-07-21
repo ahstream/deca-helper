@@ -2,7 +2,7 @@ console.info('options.js begin', window?.location?.href);
 
 import './options.css';
 
-import { initOptionsPage, mountOptionsPage } from '@ahstream/hx-chrome-lib';
+import { initOptionsPage, mountOptionsPage } from 'hx-chrome-lib';
 
 initOptionsPage();
 

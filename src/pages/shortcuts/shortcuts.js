@@ -1,7 +1,7 @@
 console.info('shortcuts.js begin', window?.location?.href);
 
-import { addPendingRequest } from '@ahstream/hx-lib';
-import { initShortcutsPage, mountShortcutsPage } from '@ahstream/hx-chrome-lib';
+import { addPendingRequest } from 'hx-lib';
+import { initShortcutsPage, mountShortcutsPage } from 'hx-chrome-lib';
 
 import { DECA_DXP_URL } from '../../js/decaHelperLib.js';
 
@@ -13,8 +13,19 @@ mountShortcutsPage(VALID_URLS, [
   {
     cmd: 'dh-run-quests',
     callback: async () => {
+      closeOtherShortcutPages();
       await addPendingRequest(DECA_DXP_URL, { action: 'runDecaQuestsFromShortcut', url: window?.location?.href });
       window.location.href = DECA_DXP_URL;
     },
   },
+  {
+    cmd: 'browser-start',
+    callback: async () => {
+      closeOtherShortcutPages();
+    },
+  },
 ]);
+
+function closeOtherShortcutPages() {
+  chrome.runtime.sendMessage({ cmd: 'closeOtherShortcutPages' });
+}

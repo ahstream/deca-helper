@@ -1,8 +1,8 @@
 console.info('serviceWorker.js begin');
 
 import { defaultOptions, overrideOptions } from '../config/config';
-import { sleep, getStorageData, initStorageWithOptions, fetchHelper, addPendingRequest } from '@ahstream/hx-lib';
-import { defaultMessageHandler } from '@ahstream/hx-chrome-lib';
+import { sleep, getStorageData, initStorageWithOptions, fetchHelper, addPendingRequest } from 'hx-lib';
+import { defaultMessageHandler } from 'hx-chrome-lib';
 import { DECA_DXP_URL, DECA_UPGRADE_URL, DECA_ARTISTS_URL } from './decaHelperLib.js';
 
 const customStorage = { runtime: { pendingRequests: [] } };
@@ -68,6 +68,9 @@ function messageHandler(request, sender, sendResponse) {
     case 'closeCollectionTabs':
       closeCollectionTabs();
       break;
+    case 'closeOtherShortcutPages':
+      closeOtherShortcutPages(sender);
+      break;
     default:
       console.error('Received unexpected message!', request, sender);
       break;
@@ -113,6 +116,22 @@ function closeCollectionTabs() {
         return;
       }
       chrome.tabs.remove(tab.id, () => console.log(`Close tab: ${tab.url}`));
+    });
+  });
+  return true;
+}
+
+function closeOtherShortcutPages(sender) {
+  chrome.tabs.query({}, (tabs) => {
+    tabs.forEach((tab) => {
+      console.log('tab', tab);
+      if (sender.tab.id === tab.id) {
+        return; // do nothing;
+      }
+      if (tab.url.includes('/shortcuts.html')) {
+        chrome.tabs.remove(tab.id, () => console.log(`Close tab: ${tab.url}`));
+        return;
+      }
     });
   });
   return true;

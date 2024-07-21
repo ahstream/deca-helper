@@ -2,7 +2,7 @@ console.info('popup.js begin', window?.location?.href);
 
 import './popup.css';
 
-import { initPopupPage, mountPopupPage } from '@ahstream/hx-chrome-lib';
+import { initPopupPage, mountPopupPage } from 'hx-chrome-lib';
 
 initPopupPage();
 

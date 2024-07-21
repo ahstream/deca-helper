@@ -1,4 +1,4 @@
-import { addPendingRequest } from '@ahstream/hx-lib';
+import { addPendingRequest } from 'hx-lib';
 
 export const EXTENSION_NAME = 'Deca Helper';
 export const DECA_DXP_URL = 'https://deca.art/decagon/dxp';

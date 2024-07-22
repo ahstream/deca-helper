@@ -13,6 +13,7 @@ mountShortcutsPage(VALID_URLS, [
   {
     cmd: 'dh-run-quests',
     callback: async () => {
+      closeOtherShortcutPages();
       await addPendingRequest(DECA_DXP_URL, { action: 'runDecaQuestsFromShortcut', url: window?.location?.href });
       window.location.href = DECA_DXP_URL;
     },
@@ -25,4 +26,14 @@ mountShortcutsPage(VALID_URLS, [
       });
     },
   },
+  {
+    cmd: 'browser-start',
+    callback: async () => {
+      closeOtherShortcutPages();
+    },
+  },
 ]);
+
+function closeOtherShortcutPages() {
+  chrome.runtime.sendMessage({ cmd: 'closeOtherShortcutPages' });
+}

@@ -35,6 +35,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 function messageHandler(request, sender, sendResponse) {
   switch (request.cmd) {
+    case 'dh-close-browser':
+      chrome.tabs.query({}, function (tabs) {
+        for (var i = 0; i < tabs.length; i++) {
+          chrome.tabs.remove(tabs[i].id);
+        }
+      });
+      window.close();
+      break;
     case 'runDecaQuests':
       loadDecaPage(sender.tab, 'runDecaQuests');
       break;

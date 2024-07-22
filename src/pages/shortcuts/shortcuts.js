@@ -17,4 +17,12 @@ mountShortcutsPage(VALID_URLS, [
       window.location.href = DECA_DXP_URL;
     },
   },
+  {
+    cmd: 'dh-close-browser',
+    callback: async () => {
+      chrome.runtime.sendMessage({
+        cmd: 'dh-close-browser',
+      });
+    },
+  },
 ]);

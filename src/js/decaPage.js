@@ -264,16 +264,16 @@ function getUpgradeButton() {
     .map((y) => [Number(y[0][1]), y[1]])
     .filter((x) => x[1].innerText.includes('Upgrade to level'))
     .filter((x) => x[0] < storage.options.autoUpgradeMaxLevel && x[0] >= storage.options.autoUpgradeMinLevel)
-    .sort((x, y) => x[0] < y[0]);
-  //.reverse();
-  console.log('elems', elems);
+    .sort((x, y) => x[0] < y[0])
+    .reverse();
+  console.log('getUpgradeButton elems', elems);
 
   if (elems.length < storage.options.autoUpgradeNth || storage.options.autoUpgradeNth < 1) {
     updateStatusbarError('No n:th decagon to upgrade!');
     return null;
   }
 
-  const elem = elems[storage.options.autoUpgradeNth - 1];
+  const elem = elems[0]; //  elems[storage.options.autoUpgradeNth - 1];
   console.log('elem', elem);
 
   const buttons = [...elem[1].querySelectorAll('button')].filter((x) => x.innerText.startsWith('Upgrade to level'));

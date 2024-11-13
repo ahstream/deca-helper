@@ -1,4 +1,4 @@
-import { addPendingRequest } from 'hx-lib';
+import { addPendingRequest, sleep } from 'hx-lib';
 
 export const EXTENSION_NAME = 'Deca Helper';
 export const DECA_DXP_URL = 'https://deca.art/decagon/dxp';
@@ -50,4 +50,31 @@ export function createStatusbarButtons({ options = true, help = false, quest = f
   }
 
   return buttons.reverse();
+}
+
+export async function activateMyTab(waitAfter = 10) {
+  focusWindow();
+  focusTab();
+  await sleep(waitAfter);
+}
+
+export async function inactivateMyTab(waitAfter = 10) {
+  unfocusTab();
+  await sleep(waitAfter);
+}
+
+export function focusTab(id = null) {
+  chrome.runtime.sendMessage({ cmd: 'focusTab', id });
+}
+
+export function focusWindow(id = null) {
+  chrome.runtime.sendMessage({ cmd: 'focusWindow', id });
+}
+
+export function unfocusTab(id = null) {
+  chrome.runtime.sendMessage({ cmd: 'unfocusTab', id });
+}
+
+export function unfocusWindow(id = null) {
+  chrome.runtime.sendMessage({ cmd: 'unfocusWindow', id });
 }

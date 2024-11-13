@@ -79,6 +79,9 @@ function messageHandler(request, sender, sendResponse) {
     case 'closeOtherShortcutPages':
       closeOtherShortcutPages(sender);
       break;
+    case 'closeSimilarPages':
+      closeSimilarPages(request.url, sender);
+      break;
     default:
       console.error('Received unexpected message!', request, sender);
       break;
@@ -137,6 +140,22 @@ function closeOtherShortcutPages(sender) {
         return; // do nothing;
       }
       if (tab.url.includes('/shortcuts.html')) {
+        chrome.tabs.remove(tab.id, () => console.log(`Close tab: ${tab.url}`));
+        return;
+      }
+    });
+  });
+  return true;
+}
+
+function closeSimilarPages(url, sender) {
+  chrome.tabs.query({}, (tabs) => {
+    tabs.forEach((tab) => {
+      console.log('tab', tab);
+      if (sender.tab.id === tab.id) {
+        return; // do nothing;
+      }
+      if (tab.url.includes(url)) {
         chrome.tabs.remove(tab.id, () => console.log(`Close tab: ${tab.url}`));
         return;
       }

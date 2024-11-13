@@ -172,6 +172,7 @@ const options = [
           ['propertyCell', 'autoUpgradeNth', 'Upgrade n:th in level order Decagon'],
         ],
       ],
+      ['property', 'endWithPicsumPage', 'endWithPicsumPage'],
     ],
   },
 ];

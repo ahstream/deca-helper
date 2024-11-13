@@ -899,6 +899,7 @@ export const defaultOptions = {
     'https://deca.art/KuMa_ART_collective/posts',
     'https://deca.art/KuMa_ART_collective/Gallery203',
   ],
+  endWithPicsumPage: false,
 };
 
 export const overrideOptions = {

@@ -25,6 +25,7 @@ import {
   DECA_STANDARD_PAGES,
   DECA_ARTISTS_PAGE_RE,
   ARTBLOCKS_TOKEN_URL_PREFIX,
+  activateMyTab,
 } from './decaHelperLib.js';
 
 // DATA ----------------------------------------------------------------------------------
@@ -35,6 +36,13 @@ const TIMEOUT_WAIT_FOR_ART_QUEST_FINISH_SECS = 60;
 const TIMEOUT_DXP_PAGE_LOADED_SECS = 10;
 
 const HOME_FEED_URL = 'https://deca.art/app';
+
+const TERMINATE_PROCESS_AFTER_FINISH = true;
+
+const TERMINATE_URL = 'https://picsum.photos/200/300';
+const TERMINATE_SIMILAR_URL = 'https://fastly.picsum.photos/';
+
+// const TERMINATE_URL = 'https://deca.art/decagon/dxp';
 
 let storage = null;
 let pageState = {
@@ -125,6 +133,8 @@ function mutationObserved(mutationList) {
 
 async function runPage() {
   console.log('runPage');
+
+  await activateMyTab();
 
   addStatusbarButtons();
 
@@ -237,6 +247,8 @@ async function selectLevelOrder() {
 async function runFeedViewer() {
   console.log('runFeedViewer');
 
+  await activateMyTab();
+
   for (let i = 0; i < storage.options.feedQuestNumPagesToScroll; i++) {
     console.log('scroll page');
     window.scrollBy({ top: storage.options.feedQuestPixelsToScroll });
@@ -282,8 +294,29 @@ function getUpgradeButton() {
   return buttons?.length ? buttons[0] : null;
 }
 
+async function endDecaProcess(doTerminate = TERMINATE_PROCESS_AFTER_FINISH) {
+  console.log('endDecaProcess, doTerminate');
+  await activateMyTab();
+  if (doTerminate) {
+    chrome.runtime.sendMessage({ cmd: 'closeOtherDecaHelperStartedPages' });
+    await sleep(5000);
+    await activateMyTab();
+    chrome.runtime.sendMessage({ cmd: 'closeSimilarPages', url: TERMINATE_SIMILAR_URL });
+    if (storage.options.endWithPicsumPage) {
+      await sleep(5000);
+      window.open(TERMINATE_URL, '_blank');
+      await sleep(5000);
+      await activateMyTab();
+      chrome.runtime.sendMessage({ cmd: 'closeMySelf' });
+      window.close();
+    }
+  }
+}
+
 async function runUpgradePage(force = false) {
   console.log('runUpgradePage');
+
+  await activateMyTab();
 
   updateStatusbarInfo('Auto upgrade...');
 
@@ -292,6 +325,7 @@ async function runUpgradePage(force = false) {
 
   if (!force && !storage.options.autoUpgrade) {
     updateStatusbar('Auto upgrade is disabled!');
+    await endDecaProcess();
     return;
   }
 
@@ -310,6 +344,8 @@ async function runUpgradePage(force = false) {
     await clickUpgradeButton(button);
     await sleep(10000);
   }
+
+  await endDecaProcess();
 }
 
 /*
@@ -325,6 +361,7 @@ async function clickUpgradeButton(button) {
   console.log('button.disabled', button.disabled);
   if (button.disabled !== false) {
     updateStatusbarWarning('Decagon upgrade button is disabled!');
+    await endDecaProcess();
     return false;
   }
 
@@ -432,8 +469,29 @@ function isRestarted() {
   return pageState.request?.action === 'restart';
 }
 
+function hasOnlyFeedQuest() {
+  const viewQuestElems = getViewQuestElems();
+  const artQuestElems = getArtQuestElems();
+  const collectionQuestElems = getCollectionQuestElems();
+  const feedQuestElems = getFeedQuestElems();
+  console.log('viewQuestElems', viewQuestElems);
+  console.log('artQuestElems', artQuestElems);
+  console.log('collectionQuestElems', collectionQuestElems);
+  console.log('feedQuestElems', feedQuestElems);
+  const res = !!(feedQuestElems?.length && !viewQuestElems?.length && !artQuestElems?.length && !collectionQuestElems?.length);
+  console.log('res', res);
+  return res;
+}
+
 async function hasFinishedAllQuests(maxWaitMs = 10, intervalMs = 10) {
   console.log('hasFinishedAllQuests');
+
+  await activateMyTab();
+
+  if (!storage.options.enableFeedQuest && hasOnlyFeedQuest()) {
+    console.log('hasOnlyFeedQuest');
+    return true;
+  }
 
   const elem = await waitForTextStartsWith('Congrats on finishing all of your quests!', 'h3', maxWaitMs, intervalMs);
   console.log('has finished elem:', elem);
@@ -706,6 +764,7 @@ async function runDecaQuests(delaySecs = 0) {
     await sleep(delaySecs * 1000);
   }
 
+  await activateMyTab();
   chrome.runtime.sendMessage({ cmd: 'closeOtherDecaPages' });
 
   if (isRestarted()) {
@@ -768,6 +827,7 @@ async function runDecaQuests(delaySecs = 0) {
   updateStatusbar('Wait for quests to finish...');
 
   Promise.all([p1, p2, p3, p4]).then(async (values) => {
+    await activateMyTab();
     console.log('quests promise return val:', values);
     // Make sure there are no rewards not claimed!
     //chrome.runtime.sendMessage({ cmd: 'focusMyTab' });
@@ -850,6 +910,7 @@ async function claimBastardRewards(maxWaitSecs = 5 * 60, intervalSecs = 10) {
 }
 
 async function restartDecaQuests(action, shouldRunViewQuest, shouldRunArtQuest) {
+  await activateMyTab();
   updateStatusbar('Restarting Deca quests to make sure everything gets done...');
   await addPendingRequest(DECA_DXP_URL, { action, shouldRunViewQuest, shouldRunArtQuest });
   await sleep(500);
@@ -859,6 +920,7 @@ async function restartDecaQuests(action, shouldRunViewQuest, shouldRunArtQuest) 
 async function waitForDecaPageToLoad(doClaim) {
   console.log('waitForDecaPageToLoad');
 
+  await activateMyTab();
   const data = { numViewQuests: 0, numCollectionQuests: 0, numArtQuests: 0, numFeedQuests: 0 };
 
   // If restarted we most likely only need to wait for one quest!
@@ -1114,6 +1176,7 @@ async function runFeedQuest(shouldRun = true) {
     updateStatusbar('No Feed quest found!');
     return;
   }
+  await activateMyTab();
 
   if (!storage.options.forceFeedQuest) {
     const n = randomInt(storage.options.sleepBeforeFeedQuestMin, storage.options.sleepBeforeFeedQuestMax);
@@ -1139,6 +1202,7 @@ async function runFeedQuest(shouldRun = true) {
 
 async function runArtQuest(pageData, shouldRun) {
   try {
+    await activateMyTab();
     console.log('runArtQuest', pageData, shouldRun);
 
     if (!shouldRun) {

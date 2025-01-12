@@ -153,7 +153,7 @@ async function runPage() {
 
   if (pageState.request?.action === 'runDecaQuestsFromShortcut' && isDecaDxpPage()) {
     console.log('pageState.request', pageState.request);
-    const delaySecs = pageState.request.delaySecs?.length ? Number(pageState.request.delaySecs[0]) : 0;
+    const delaySecs = 30; // pageState.request.delaySecs?.length ? Number(pageState.request.delaySecs[0]) : 0;
     console.log('runDecaQuestsFromShortcut, delaySecs:', delaySecs);
     return await runDecaQuests(delaySecs);
   }
